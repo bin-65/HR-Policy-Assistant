@@ -1,6 +1,14 @@
-.streamlit/secrets.toml
-__pycache__/
-*.pyc
-.env
-.venv/
+# Python environment
 venv/
+__pycache__/
+*.py[cod]
+
+# Streamlit local settings
+.streamlit/
+
+# Vector Store local cache
+chroma_db/
+.chroma/
+
+# Environment keys
+.env
