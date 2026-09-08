@@ -1,14 +1,8 @@
-# HR Policy Assistant — RAG
+# Built HR Policy Assistant Application
 
-A beginner-friendly Streamlit RAG application using:
-- Groq LLM
-- LangChain
-- FAISS vector search
-- Hugging Face sentence-transformers embeddings
-- PDF HR policy
+An AI-powered Retrieval-Augmented Generation (RAG) assistant designed to search and answer queries from company HR Policy PDF documents using Streamlit and `openai/gpt-oss-20b`.
 
-## Project structure
-
+## Project Structure
 ```text
 hr-policy-rag/
 ├── app.py
@@ -17,24 +11,3 @@ hr-policy-rag/
 ├── README.md
 └── data/
     └── hr_policy.pdf
-```
-
-## Important
-
-Do NOT upload your API key to GitHub.
-
-For local testing, create:
-
-`.streamlit/secrets.toml`
-
-with:
-
-```toml
-GROQ_API_KEY = "your_groq_api_key_here"
-```
-
-For Streamlit Community Cloud, add the same secret in the app's Secrets settings.
-
-## HR PDF
-
-Replace `data/hr_policy.pdf` with your own HR policy PDF.
