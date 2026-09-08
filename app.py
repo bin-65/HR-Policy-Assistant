@@ -6,14 +6,8 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
-
-# Fix for LangChain imports across different library versions
-try:
-    from langchain.chains import create_retrieval_chain
-    from langchain.chains.combine_documents import create_stuff_documents_chain
-except ImportError:
-    from langchain.chains.retrieval import create_retrieval_chain
-    from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
 
 # Page configuration
 st.set_page_config(
@@ -67,13 +61,17 @@ else:
     st.error(f"Missing PDF document at `{DATA_PDF}`. Please check directory structure.")
     st.stop()
 
-# Instantiate Chat Model (openai/gpt-oss-20b)
+# Instantiate Chat Model
 llm = ChatOpenAI(
     model="openai/gpt-oss-20b",
     openai_api_key=api_key,
     openai_api_base=api_base,
     temperature=0.2
 )
+
+# Helper function to format retrieved documents
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
 
 # System Prompt Template
 system_prompt = (
@@ -86,13 +84,17 @@ system_prompt = (
 prompt = ChatPromptTemplate.from_messages(
     [
         ("system", system_prompt),
-        ("human", "{input}"),
+        ("human", "{question}"),
     ]
 )
 
-# RAG Chain Creation
-question_answer_chain = create_stuff_documents_chain(llm, prompt)
-rag_chain = create_retrieval_chain(retriever, question_answer_chain)
+# Robust LCEL RAG Chain (No deprecated chain imports required)
+rag_chain = (
+    {"context": retriever | format_docs, "question": RunnablePassthrough()}
+    | prompt
+    | llm
+    | StrOutputParser()
+)
 
 # Streamlit Chat Session State
 if "messages" not in st.session_state:
@@ -112,13 +114,14 @@ if user_query := st.chat_input("e.g., What is the casual leave policy?"):
     with st.chat_message("assistant"):
         with st.spinner("Searching HR Policy..."):
             try:
-                response = rag_chain.invoke({"input": user_query})
-                answer = response["answer"]
+                # Execute LCEL chain
+                answer = rag_chain.invoke(user_query)
                 st.write(answer)
                 
-                # Show source excerpts in expander
+                # Retrieve context documents for reference
+                ref_docs = retriever.invoke(user_query)
                 with st.expander("View Reference Policy Clauses"):
-                    for doc in response["context"]:
+                    for doc in ref_docs:
                         st.markdown(f"**Page {doc.metadata.get('page', 'N/A') + 1}:**")
                         st.write(doc.page_content)
                         st.divider()
