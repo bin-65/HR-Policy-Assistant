@@ -1,14 +1,19 @@
 import os
-import tempfile
 import streamlit as st
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_openai import ChatOpenAI
-from langchain.chains import create_retrieval_chain
-from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
+
+# Fix for LangChain imports across different library versions
+try:
+    from langchain.chains import create_retrieval_chain
+    from langchain.chains.combine_documents import create_stuff_documents_chain
+except ImportError:
+    from langchain.chains.retrieval import create_retrieval_chain
+    from langchain.chains.combine_documents import create_stuff_documents_chain
 
 # Page configuration
 st.set_page_config(
@@ -18,7 +23,7 @@ st.set_page_config(
 )
 
 st.title("🏢 Built HR Policy Assistant")
-st.caption("Ask questions about company HR rules, leave policies, and procedures.")
+st.caption("Ask questions about company HR rules, leave policies, and workplace guidelines.")
 
 # Sidebar - API Credentials
 st.sidebar.header("Configuration")
