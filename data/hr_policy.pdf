@@ -1,0 +1,61 @@
+import os
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+
+# Folder aur PDF path setup
+os.makedirs("data", exist_ok=True)
+pdf_path = os.path.join("data", "hr_policy.pdf")
+
+doc = SimpleDocTemplate(pdf_path, pagesize=letter)
+styles = getSampleStyleSheet()
+
+title_style = ParagraphStyle(
+    'TitleStyle',
+    parent=styles['Heading1'],
+    fontSize=18,
+    leading=22,
+    alignment=1,
+    spaceAfter=20
+)
+
+heading_style = ParagraphStyle(
+    'HeadingStyle',
+    parent=styles['Heading2'],
+    fontSize=14,
+    leading=18,
+    spaceBefore=12,
+    spaceAfter=6
+)
+
+body_style = ParagraphStyle(
+    'BodyStyle',
+    parent=styles['Normal'],
+    fontSize=10,
+    leading=14,
+    spaceAfter=8
+)
+
+story = []
+story.append(Paragraph("BUILT HR POLICY & EMPLOYEE MANUAL", title_style))
+story.append(Spacer(1, 10))
+
+story.append(Paragraph("1. Code of Conduct & Ethics", heading_style))
+story.append(Paragraph("All employees are expected to maintain the highest standards of professional conduct, integrity, and ethical behavior. Discrimination or harassment of any kind based on race, gender, religion, or background is strictly prohibited.", body_style))
+
+story.append(Paragraph("2. Working Hours & Attendance", heading_style))
+story.append(Paragraph("Standard office hours are from 9:00 AM to 5:00 PM, Monday through Friday. Core hours for remote/hybrid employees are 10:00 AM to 4:00 PM. Punctuality is required for all meetings and scheduled duties.", body_style))
+
+story.append(Paragraph("3. Leave Policy", heading_style))
+story.append(Paragraph("<b>Casual Leave:</b> Employees are entitled to 10 days of paid casual leave per calendar year.<br/>"
+                       "<b>Sick Leave:</b> Employees are granted 8 days of paid sick leave annually. Medical certificate is required for more than 2 consecutive days.<br/>"
+                       "<b>Annual Paid Leave:</b> 15 days of earned annual leave after completing probation.", body_style))
+
+story.append(Paragraph("4. Probation Period", heading_style))
+story.append(Paragraph("New hires undergo a 3-month probation period. Performance reviews will be conducted at 45 days and 90 days prior to confirmation.", body_style))
+
+story.append(Paragraph("5. Confidentiality & Asset Use", heading_style))
+story.append(Paragraph("Company equipment, laptops, and credentials are provided exclusively for official business. Proprietary software, codebase, and internal documents must remain confidential.", body_style))
+
+doc.build(story)
+print("hr_policy.pdf successfully created inside data/ directory!")
